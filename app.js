@@ -6,6 +6,9 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const multer = require('multer')
 
+const feedRoutes = require('./routes/feed')
+const authRoutes = require('./routes/auth')
+
 const app = express()
 
 const fileStorage = multer.diskStorage({
@@ -39,15 +42,16 @@ app.use((req, res, next) => {
     next()
 })
 
-const feedRoutes = require('./routes/feed')
 
 app.use('/feed', feedRoutes)
+app.use('/auth', authRoutes)
 
 app.use((err, req, res, next) => {
     console.log(err)
     const status = err.statusCode || 500
     const message = err.message 
-    res.status(status).json({message: message})
+    const data = err.data
+    res.status(status).json({message: message, data: data})
 })
 
 mongoose.connect(process.env.MONGODB_URI)
